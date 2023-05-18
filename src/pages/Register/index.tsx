@@ -17,7 +17,7 @@ import { Link as ReactRouterLink, useNavigate } from 'react-router-dom'
 import { ScrollView } from '../../components'
 import { useAppContext } from '../../context/App'
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const { setColorMode } = useColorMode()
 
   useEffect(() => {
@@ -46,12 +46,14 @@ const LoginPage = () => {
     formState: { isSubmitting }
   } = useForm({ defaultValues })
 
-  const onLogin = async ({ email, password }: typeof defaultValues) => {
+  const onRegister = async ({ email, password }: typeof defaultValues) => {
     try {
-      const { data } = await axios.post('http://localhost:4000/login', { email, password })
+      const { data } = await axios.post('http://localhost:4000/register', {
+        email,
+        password
+      })
       setUser(data.user)
       localStorage.setItem('JWT', data.jwt)
-      localStorage.setItem('USER', JSON.stringify(data.user))
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -86,7 +88,7 @@ const LoginPage = () => {
               width="100%"
             >
               <Heading as="h1" textAlign="center">
-                Welcome Back
+                Welcome to My Cinema
               </Heading>
               <Text as="small" color="gray.400" marginBottom={8}>
                 Please enter your details to continue
@@ -97,20 +99,15 @@ const LoginPage = () => {
                   <Input placeholder="Password" type="password" {...register('password')} />
                 </fieldset>
 
-                <HStack justifyContent="space-between" marginBottom={10} marginTop={4}>
-                  <Text fontSize={16} fontWeight={400} color="black">
-                    Forgot password?
-                  </Text>
-                  <Button isLoading={isSubmitting} marginBottom={4} onClick={handleSubmit(onLogin)}>
-                    Sign In
-                  </Button>
-                </HStack>
+                <Button marginY={5} isLoading={isSubmitting} onClick={handleSubmit(onRegister)}>
+                  Register
+                </Button>
               </form>
               <Text>
-                Don't have an account?{' '}
+                Already have an account?{' '}
                 <strong>
-                  <Link as={ReactRouterLink} to="/register">
-                    Sign Up
+                  <Link as={ReactRouterLink} to="/">
+                    Login
                   </Link>
                 </strong>
               </Text>
@@ -122,4 +119,4 @@ const LoginPage = () => {
   )
 }
 
-export default LoginPage
+export default RegisterPage
