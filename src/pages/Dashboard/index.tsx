@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PageWrap } from '../../layout'
+import { returnImgUrl } from '../../utils'
 
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -43,7 +44,6 @@ const Dashboard = () => {
       <Flex overflowX="scroll" marginBottom={5} justifyContent="space-evenly" width="100%">
         {genres.map(({ id, name }) => (
           <Card
-            // backgroundColor="#242529"
             key={id}
             minWidth="110px"
             borderRadius="10px"
@@ -59,11 +59,12 @@ const Dashboard = () => {
         ))}
       </Flex>
       <Card
-        backgroundImage={'https://image.tmdb.org/t/p/w500' + highlight?.backdrop_path}
+        alignSelf="flex-start"
+        backgroundImage={returnImgUrl(highlight?.backdrop_path)}
         backgroundSize="cover"
         backgroundPosition="center"
         backgroundRepeat="no-repeat"
-        width="100%"
+        width="93%"
         height="500px"
         borderRadius="20px"
         justifyContent="flex-end"
@@ -78,7 +79,7 @@ const Dashboard = () => {
           </Flex>
         </Flex>
       </Card>
-      <Flex alignSelf="flex-start" width={300} height={150}>
+      <Flex alignSelf="flex-start">
         <Text textAlign="left" marginY={10} fontSize={25}>
           Trending
         </Text>
@@ -97,7 +98,7 @@ const Dashboard = () => {
             <Image
               width="300px"
               height="100px"
-              src={'https://image.tmdb.org/t/p/w500' + trending?.backdrop_path}
+              src={returnImgUrl(trending?.backdrop_path)}
               borderRadius="20px"
               objectFit="cover"
             />
