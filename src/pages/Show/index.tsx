@@ -7,19 +7,23 @@ import {
   Button,
   Card,
   Flex,
-  Text
+  Text,
+  useToast
 } from '@chakra-ui/react'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { AiOutlineArrowLeft } from 'react-icons/ai'
 import { useNavigate, useParams } from 'react-router-dom'
+import useAPI from '../../hooks/useAPI'
 import { PageWrap } from '../../layout'
+import { returnImgUrl } from '../../utils'
 import SeasonEpisodes from './SeasonEpisodes'
 
-const Dashboard = () => {
+const ShowPage = () => {
+  const { apiPost } = useAPI()
   const params = useParams()
   const navigate = useNavigate()
-
+  const toast = useToast()
   const showId = params.id
 
   const [showDetails, setShowDetails] = useState<any>()
@@ -30,14 +34,60 @@ const Dashboard = () => {
         `https://api.themoviedb.org/3/tv/${showId}?api_key=1e5ff94f206cccc57ee88db7422ec433`
       )
       setShowDetails(data)
-    } catch (error) {
-      console.log({ error })
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        status: 'error'
+      })
     }
   }
 
   useEffect(() => {
     getShowDetails()
   }, [])
+
+  const [watchedEpisodes, setWatchedEpisodes] = useState<number[]>([])
+
+  const getWatchedEpisodes = async () => {
+    try {
+      const data = await apiPost('/watched-episodes', { showId })
+      const ids = data.map((episode: any) => episode.episodeId)
+      setWatchedEpisodes(ids)
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        status: 'error'
+      })
+    }
+  }
+
+  useEffect(() => {
+    getWatchedEpisodes()
+  }, [])
+
+  const [isSaving, setIsSaving] = useState(false)
+
+  const onSaveShow = async () => {
+    try {
+      setIsSaving(true)
+      await apiPost('/add-show', { showId })
+      toast({
+        title: 'Success',
+        description: 'Show added to your list',
+        status: 'success'
+      })
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        status: 'error'
+      })
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   return (
     <PageWrap title="Home" paddingTop={10}>
@@ -46,7 +96,7 @@ const Dashboard = () => {
         <Text marginLeft={2}>Go back</Text>
       </Flex>
       <Flex
-        width="100%"
+        width="90%"
         marginBottom={5}
         flexDirection="row"
         justifyContent="space-between"
@@ -54,14 +104,16 @@ const Dashboard = () => {
         paddingBottom={5}
       >
         <Text fontSize={35}>{showDetails?.name}</Text>
-        <Button>Save</Button>
+        <Button isLoading={isSaving} onClick={onSaveShow}>
+          Save
+        </Button>
       </Flex>
       <Card
-        backgroundImage={'https://image.tmdb.org/t/p/w500' + showDetails?.backdrop_path}
+        backgroundImage={returnImgUrl(showDetails?.backdrop_path)}
         backgroundSize="cover"
         backgroundPosition="center"
         backgroundRepeat="no-repeat"
-        width="100%"
+        width="90%"
         height="500px"
         borderRadius="20px"
         justifyContent="flex-end"
@@ -81,7 +133,7 @@ const Dashboard = () => {
           </Flex>
         </Flex>
       </Card>
-      <Flex width="100%" paddingTop={5}>
+      <Flex width="90%" paddingTop={5}>
         <Accordion allowToggle width="100%">
           {showDetails?.seasons.map((season: any) => (
             <AccordionItem key={season.id}>
@@ -93,7 +145,11 @@ const Dashboard = () => {
               </AccordionButton>
               <AccordionPanel pb={4}>
                 {season?.overview}
-                <SeasonEpisodes showId={showDetails?.id} seasonNumber={season?.season_number} />
+                <SeasonEpisodes
+                  watchedEpisodes={watchedEpisodes}
+                  showId={showDetails?.id}
+                  seasonNumber={season?.season_number}
+                />
               </AccordionPanel>
             </AccordionItem>
           ))}
@@ -103,4 +159,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default ShowPage
