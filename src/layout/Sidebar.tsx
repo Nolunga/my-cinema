@@ -1,5 +1,5 @@
 import { Card, Flex, LinkBox, useColorMode } from '@chakra-ui/react'
-import { HiHeart, HiHome, HiOutlineLogout, HiUserCircle } from 'react-icons/hi'
+import { HiHeart, HiHome, HiOutlineLogout } from 'react-icons/hi'
 import { MdLightMode, MdOutlineLightMode } from 'react-icons/md'
 import { NavLink, useLocation } from 'react-router-dom'
 import { ScrollView } from '../components'
@@ -12,10 +12,6 @@ const LINKS = [
   {
     route: '/my-shows',
     icon: HiHeart
-  },
-  {
-    route: '/profile',
-    icon: HiUserCircle
   }
 ]
 
@@ -25,6 +21,11 @@ const Sidebar = () => {
   const { colorMode, toggleColorMode } = useColorMode()
 
   const color = colorMode === 'dark' ? 'white' : '#242529'
+
+  const onLogout = () => {
+    localStorage.clear()
+    window.location.replace('/')
+  }
 
   return (
     <Card flex="none" height="100vh" maxWidth={100} width="100%">
@@ -63,7 +64,7 @@ const Sidebar = () => {
           cursor="pointer"
           height={12}
           marginBottom={4}
-          onClick={() => {}}
+          onClick={onLogout}
           alignItems="center"
           justifyContent="center"
         >
